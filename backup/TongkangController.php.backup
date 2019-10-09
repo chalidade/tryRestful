@@ -1,0 +1,116 @@
+<?php
+
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use App\Tongkang;
+use DB;
+
+class TongkangController extends Controller
+{
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct(\Illuminate\Http\Request $request) {
+        $this->request = $request;
+    }
+
+    public function json(Request $request) {
+      $input = $this->request->all();
+      $action = $input['action'];
+
+      // Input
+      if ($action == "save")
+      {
+        $table = $input['table'];
+        return $this->save($table, $input);
+      }
+
+      // Search
+      else if($action == "search")  {
+        $table = $input['table'];
+        return $this->search($table, $input);
+      }
+
+      // Edit
+      else if($action == "edit")  {
+        $table = $input['table'];
+        return $this->edit($table, $input);
+      }
+
+      // Delete
+      else if($action == "delete")  {
+        $table = $input['table'];
+        return $this->delete($table, $input);
+      }
+
+      // Show
+      else if($action == "show")  {
+        $table = $input['table'];
+        return $this->show($table, $input);
+      }
+    }
+
+    public function search($table, $input) {
+      $table = $input['table'];
+      $a     = $input['parameter']["data"];
+      $b     = $input['parameter']["value"];
+      // Get Parameter
+      for ($i=0; $i < count($a); $i++) {
+        $result[] = array($a[$i],'=',$b[$i]);
+      }
+      // $data = DB::table($table)->Where($result)->get();
+      return response($result);
+    }
+
+    public function show($table, $input) {
+      $table  = $input['table'];
+      $a     = $input['parameter']["data"];
+      // If Parameter Not Null
+      if ($a != NULL)
+      {
+        // Get Parameter
+        for ($i=0; $i < count($a); $i++) {
+          $result[] = $a[$i];
+        }
+        $data   = DB::table($table)->select($result)->get();
+        return response()->json($data);
+      }
+      // If Parameter NULL
+      else {
+        $data   = DB::table($table)->get();
+        return response()->json($data);
+      }
+    }
+
+    public function delete($table, $input) {
+      $table = $input['table'];
+      $a     = $input['parameter']["data"];
+      $b     = $input['parameter']["value"];
+      for ($i=0; $i < count($a); $i++) {
+        $result[] = array($a[$i],'=',$b[$i]);
+      }
+      $data = DB::table($table)->Where($result)->delete();
+      return response("Berhasil Hapus Data");
+    }
+
+    public function save($table, $input) {
+      $table = $input['table'];
+      $a     = $input['parameter']["data"];
+      $b     = $input['parameter']["value"];
+      $s     = ['nocontainer'=>'123455','norequest'=>'1234','containersize'=>'3X7','tglreq'=>'1 NOVEMBER 2019','operator'=>'Inggit','alat'=>'bubut','commodity'=>'SABUT KELAPA','namatongkang'=>'TONG','remark'=>'123123'];
+      for ($i=0; $i < count($a); $i++) {
+        $result[] = array($a[$i],'=',$b[$i]);
+      }
+      // $data   = DB::table($table)->insert('nocontainer'=>'123455','norequest'=>'1234','containersize'=>'3X7','tglreq'=>'1 NOVEMBER 2019','operator'=>'Inggit','alat'=>'bubut','commodity'=>'SABUT KELAPA','namatongkang'=>'TONG','remark'=>'123123');
+      return response($s);
+    }
+
+    public function edit($table, $input) {
+      $id   = $input['id'];
+      return response("Edit $table");
+    }
+
+
+}
