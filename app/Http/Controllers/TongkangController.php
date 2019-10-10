@@ -167,7 +167,24 @@ class TongkangController extends Controller
 
     public function edit($input) {
       $table  = $input["table"];
-      return response("Edit $table");
+      $param  = $input["value"];
+      $where  = $input["where"];
+      $query  = DB::table($table)->where($where)->update($param);
+
+      return response("Edit Berhasil");
+    }
+
+    public function edits($input) {
+      $parameter = $input["data"];
+      $countData = count($parameter);
+      for ($i=0; $i < $countData; $i++) {
+        $table  = $parameter[$i]["table"];
+        $where  = $parameter[$i]["where"];
+        $value  = $parameter[$i]["value"];
+        $query  = DB::table($table)->where($where)->update($value);
+      }
+
+      return response("Update Berhasil");
     }
 
     public function checkData($input) {
@@ -193,9 +210,15 @@ class TongkangController extends Controller
 
     }
 
-    public function join($input) {
-      
-      return response("Join");
+    public function other($input) {
+      $raw   = $input["raw"];
+      if (isset($input['value'])) {
+        $param = $input["value"];
+        $table = DB::select($raw, $param);
+      } else {
+        $table = DB::select($raw);
+      }
+      return response($table);
     }
 
 }
