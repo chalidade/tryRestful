@@ -24,6 +24,29 @@ class AuthController extends BaseController
     public function __construct(Request $request) {
         $this->request = $request;
     }
+
+    // Register
+    public function register(Request $request)
+   {
+       $this->validate($request, [
+           'email'    => 'required|email|unique:users',
+           'password' => 'required'
+       ]);
+
+       $input          = $this->request->all();
+       $hasher         = app()->make('hash');
+       $user           = new User;
+       $user->name     = $input["name"];
+       $user->email    = $input["email"];
+       $user->password = $hasher->make($input["password"]);
+       $user->save();
+
+       $res['success'] = true;
+       $res['message'] = 'Success register!';
+       $res['data'] = $user;
+       return response($res);
+   }
+
     /**
      * Create a new token.
      *

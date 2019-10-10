@@ -15,48 +15,14 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->post  ('/json', 'TongkangController@json');
+
 
 // Auth
-$router->post(
-    'auth/login',
-    [
-       'uses' => 'AuthController@authenticate'
-    ]
+$router->post('auth/login',['uses' => 'AuthController@authenticate']);
+$router->post('/register', 'AuthController@register');
+
+// Api
+$router->post  ('/api', 'TongkangController@api');
+$router->group(['middleware' => 'jwt.auth'],function() use ($router) {
+  }
 );
-
-$router->group(
-    ['middleware' => 'jwt.auth'],
-    function() use ($router) {
-        $router->get('users', function() {
-            $users = \App\User::all();
-            return response()->json($users);
-        });
-    }
-);
-
-// Prefix /tongkang/
-/*
-Note :
-1. Tambahi Search bisa isikan dari body
-2. Authentication Barier Token JWT (v)
-3. Mapping Postman (add collection (v)) - base url
-4. Passport js
-5. Secret key
-6. CORS
-7. CSRF
-8. Nampilin data sesuai keinginan
-9. Buat format JSON
-10. Coba kalo input table lebih dari satu
-11. Lebih dari satu Data
-12. Banyak table banyak data 
-
-*/
-// $router->group (['middleware' => 'jwt.auth', 'prefix' => 'tongkang'], function () use ($router) {
-//   $router->post  ('/json'       , 'TongkangController@json');
-// $router->get   ('/'           , 'TongkangController@index');
-// $router->post  ('/input'      , 'TongkangController@store');
-// $router->get   ('/search/{id}', 'TongkangController@show');
-// $router->put   ('/update/{id}', 'TongkangController@update');
-// $router->delete('/delete/{id}', 'TongkangController@destroy');
-// });
