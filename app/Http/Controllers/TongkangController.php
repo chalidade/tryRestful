@@ -145,7 +145,7 @@ class TongkangController extends Controller
       } else {
           $data   = DB::table($table)->insert($parameter);
       }
-      return response("Data Berhasil Disimpan");
+      return response($parameter);
     }
 
     public function saves($input) {
@@ -163,6 +163,22 @@ class TongkangController extends Controller
         }
       }
       return response()->json("Berhasil Simpan data");
+    }
+
+    public function savelinked($input) {
+      $primaryTable = $input["table"];
+      $anotherTable = $input["linkto"];
+      $parameter    = $input["parameter"];
+      $linkby       = $input["linkby"];
+      $linkedvalue  = $parameter[$linkby];
+      $dataa        = $input["data"];
+      $datab        = array($linkby => $linkedvalue,);
+      $combine      = $datab+$dataa;
+
+      $data         = DB::table($primaryTable)->insert($parameter);
+      $data         = DB::table($anotherTable)->insert($combine);
+
+      return response("Berhasil Save");
     }
 
     public function edit($input) {
@@ -221,4 +237,10 @@ class TongkangController extends Controller
       return response($table);
     }
 
+    public function xml($input) {
+        $xml = new \SimpleXMLElement('<root/>');
+        $array = array_flip($input);
+        array_walk_recursive($array, array ($xml, 'addChild'));
+        return $xml->asXML();
+    }
 }
