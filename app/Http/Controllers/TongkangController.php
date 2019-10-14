@@ -182,7 +182,28 @@ class TongkangController extends Controller
     }
 
     public function headerdetail($input) {
-      
+      // Header
+      $header          = $input["header"];
+      $parameter       = $input['input'];
+      $detail          = $input["detail"];
+      $data            = DB::table($header)->insert($parameter);
+
+      // Get ID
+      $latest          = DB::table($header)->orderBy('id', 'desc')->take(1)->get();
+      $decode          = json_decode($latest, true);
+      $id              = array('id' => $decode[0]["id"],);
+      $res['header']   = $decode;
+
+      // Detail
+      $detail          = $input["detail"];
+      for ($i=0; $i < count($detail); $i++) {
+        $secondary     = $detail[$i]["table"];
+        $combine       = $id+$detail[$i]["input"];
+        $data       = DB::table($secondary)->insert($combine);
+        $res['detail'][$secondary] = $combine;
+      };
+
+      return response()->json($res);
     }
 
     public function edit($input) {

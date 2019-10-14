@@ -26,3 +26,12 @@ $router->post  ('/api', 'TongkangController@api');
 $router->group(['middleware' => 'jwt.auth'],function() use ($router) {
   }
 );
+
+// baru
+// between and
+/*
+json-> form
+form -> json
+validasi table
+save dan update digabung jika ada id maka update jika tidak ada berarti save
+*/
