@@ -181,6 +181,10 @@ class TongkangController extends Controller
       return response("Berhasil Save");
     }
 
+    public function headerdetail($input) {
+      
+    }
+
     public function edit($input) {
       $table  = $input["table"];
       $param  = $input["value"];
