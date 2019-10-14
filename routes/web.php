@@ -24,6 +24,7 @@ $router->post('/register', 'AuthController@register');
 // Api
 $router->post  ('/api', 'TongkangController@api');
 $router->group(['middleware' => 'jwt.auth'],function() use ($router) {
+
   }
 );
 
