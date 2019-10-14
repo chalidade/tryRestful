@@ -268,4 +268,22 @@ class TongkangController extends Controller
         array_walk_recursive($array, array ($xml, 'addChild'));
         return $xml->asXML();
     }
+
+    public function saveedit($input) {
+      $table      = $input["table"];
+      $parameter  = $input['parameter'];
+      $jumlah     = count($parameter);
+      if ($jumlah > 1) {
+        for ($i   = 0; $i < $jumlah; $i++) {
+          $data   = DB::table($table)->insert($parameter[$i]);
+        }
+      } else {
+          $data   = DB::table($table)->insert($parameter);
+      }
+      return response($parameter);
+    }
+
+    public function val($input) {
+      return response($input);
+    }
 }

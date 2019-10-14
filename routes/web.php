@@ -34,4 +34,9 @@ json-> form
 form -> json
 validasi table
 save dan update digabung jika ada id maka update jika tidak ada berarti save
+file base64
+Endpoint (url) dipisah (index, store, view)
+select -> pagination
+config taruh diluar vendor
+
 */
