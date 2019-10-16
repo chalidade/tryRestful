@@ -19,10 +19,16 @@ class TongkangController extends Controller
     public function api(Request $request) {
       $input  = $this->request->all();
       $action = $input["action"];
+      $table  = $input["table"];
+
+      if ($action == "saveform") {
+        $this->validasi($table, $request);
+      }
+
       return $this->$action($input);
     }
 
-    public function view($input) {
+    function view($input) {
       $table  = $input["table"];
       if(isset( $input['parameter']["selected"])){
         $e          = $input['parameter']["selected"];
@@ -115,7 +121,7 @@ class TongkangController extends Controller
           }
         }
 
-    public function delete($input) {
+    function delete($input) {
       $table   = $input["table"];
       if (isset($input['parameter']) AND isset($input['parameter']["data"])) {
         $a     = $input['parameter']["data"];
@@ -134,7 +140,7 @@ class TongkangController extends Controller
       }
     }
 
-    public function save($input) {
+    function save($input) {
       $table      = $input["table"];
       $parameter  = $input['parameter'];
       $jumlah     = count($parameter);
@@ -148,7 +154,7 @@ class TongkangController extends Controller
       return response($parameter);
     }
 
-    public function saves($input) {
+    function saves($input) {
       $countData    = count($input["data"]);
       for ($i=0; $i < $countData; $i++) {
       $table        = $input["data"][$i]["table"];
@@ -165,7 +171,7 @@ class TongkangController extends Controller
       return response()->json("Berhasil Simpan data");
     }
 
-    public function savelinked($input) {
+    function savelinked($input) {
       $primaryTable = $input["table"];
       $anotherTable = $input["linkto"];
       $parameter    = $input["parameter"];
@@ -181,7 +187,7 @@ class TongkangController extends Controller
       return response("Berhasil Save");
     }
 
-    public function headerdetail($input) {
+    function headerdetail($input) {
       // Header
       $header          = $input["header"];
       $parameter       = $input['input'];
@@ -199,14 +205,14 @@ class TongkangController extends Controller
       for ($i=0; $i < count($detail); $i++) {
         $secondary     = $detail[$i]["table"];
         $combine       = $id+$detail[$i]["input"];
-        $data       = DB::table($secondary)->insert($combine);
+        $data          = DB::table($secondary)->insert($combine);
         $res['detail'][$secondary] = $combine;
       };
 
       return response()->json($res);
     }
 
-    public function edit($input) {
+    function edit($input) {
       $table  = $input["table"];
       $param  = $input["value"];
       $where  = $input["where"];
@@ -215,7 +221,7 @@ class TongkangController extends Controller
       return response("Edit Berhasil");
     }
 
-    public function edits($input) {
+    function edits($input) {
       $parameter = $input["data"];
       $countData = count($parameter);
       for ($i=0; $i < $countData; $i++) {
@@ -228,7 +234,7 @@ class TongkangController extends Controller
       return response("Update Berhasil");
     }
 
-    public function checkData($input) {
+    function checkData($input) {
       $table  = $input["table"];
       if (isset($input['parameter'])) {
         $a = $input['parameter']["data"];
@@ -251,7 +257,7 @@ class TongkangController extends Controller
 
     }
 
-    public function other($input) {
+    function other($input) {
       $raw   = $input["raw"];
       if (isset($input['value'])) {
         $param = $input["value"];
@@ -262,14 +268,14 @@ class TongkangController extends Controller
       return response($table);
     }
 
-    public function xml($input) {
+    function xml($input) {
         $xml = new \SimpleXMLElement('<root/>');
         $array = array_flip($input);
         array_walk_recursive($array, array ($xml, 'addChild'));
         return $xml->asXML();
     }
 
-    public function saveedit($input) {
+    function saveedit($input) {
       $table      = $input["table"];
       $parameter  = $input['parameter'];
       $jumlah     = count($parameter);
@@ -283,7 +289,62 @@ class TongkangController extends Controller
       return response($parameter);
     }
 
-    public function val($input) {
-      return response($input);
+    // Move Ke Server
+    // Index
+    function index($input) {
+      // Inisialisasi
+      $connect  = \DB::table($input["table"])->orderBy($input['orderby'][0], $input['orderby'][1]);
+
+      // Search Parameter Exist
+      if (isset($input['search'])) {
+        $connect->orwhere($input['search'][0], 'like', $input['search'][1].'%');
+      }
+
+      $result   = $connect->skip($input['pagination'][0])->take($input['pagination'][1])->get();
+      $count   = $connect->count();
+
+      return response()->json(["result"=>$result, "count"=>$count]);
     }
+
+    // View
+    public function saveform($input) {
+      return response("Berhasil");
+    }
+
+    function validasi($table, $request) {
+      $latest   = DB::table('validation')->where('nama_tbl', 'like', $table."%")->select(["field", "mandatori"])->get();
+      $decode   = json_decode($latest, true);
+      $s        = array();
+      for ($i=0; $i < count($decode); $i++) {
+      $s[$decode[$i]["field"]] = $decode[$i]["mandatori"];
+      };
+
+      $this->validate($request, $s);
+    }
+
+    // //Helper
+    // public function BasicShow($connect) {
+    //   $data     = $connect->get();
+    //   return $data;
+    // }
 }
+
+
+// Mengubah dari form ke json itu perlu validasi
+/* cek tipe data : string numerik, date
+ketika form pke json ke string di potong
+semua harus dirubah kalo tidak numerik jadi nol error validate
+date bentuk apaun harus siap ke database
+untuk error
+
+paing panjang alamat
+untuk table validasi
+Nama table, field name, mandatori, message.
+mandatori itu 0 dan 1
+Date - File
+validate string format tanggal atau bukan
+buat funcrion buat hapus file sama upload file
+
+Kalo nggak diakses diluar controller / hanya di controller saja bukan dari route dibuat function
+
+*/

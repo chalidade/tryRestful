@@ -39,5 +39,8 @@ file base64
 Endpoint (url) dipisah (index, store, view)
 select -> pagination
 config taruh diluar vendor
-
 */
+
+$router->get('/index', 'IndexController@api');
+$router->get('/view',  'ViewController@api');
+$router->get('/store', 'StoreController@api');
